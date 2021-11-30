@@ -1,0 +1,48 @@
+﻿@page "/getreportinvokeinfo"
+@using PowerBIBlazor.Shared
+@inject HttpClient Http
+
+@if (gotReportInfo)
+{
+    <label style="font-weight:700">Id:</label>
+    <span>@reportViewModel?.Id</span>
+    <br/>
+    <label style="font-weight:700">Name:</label>
+    <span>@reportViewModel?.Name</span>
+    <br/>
+    <label style="font-weight:700">Embed URL:</label>
+    <span>@reportViewModel?.EmbedUrl</span>
+    <br/>
+    <label style="font-weight:700">Token:</label>
+    <span>@reportViewModel?.Token</span>
+}
+else if (String.IsNullOrEmpty(errorMessage))
+{
+    <label>Trying to get report invokation information from Power BI Services...</label>
+    <span>@errorMessage</span>
+}
+else
+{
+    <label style="font-weight:700">Cannot acquire Report Invoke Information from Power BI Services:</label>
+    <span>@errorMessage</span>
+}
+
+@code {
+    private bool gotReportInfo = false;
+    private string errorMessage = String.Empty;
+    private EmbeddedReportViewModel? reportViewModel;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            reportViewModel = await Http.GetFromJsonAsync<EmbeddedReportViewModel>("api/PowerBI");
+            gotReportInfo = true;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+            gotReportInfo = false;
+        }
+    }
+}

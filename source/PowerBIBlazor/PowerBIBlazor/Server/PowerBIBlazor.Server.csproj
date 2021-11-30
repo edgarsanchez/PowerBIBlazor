@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>6891a6d6-a7f0-4f6b-bb68-67db6bc15162</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.37.0" />
+    <PackageReference Include="Microsoft.PowerBI.Api" Version="3.30.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Client\PowerBIBlazor.Client.csproj" />
+    <ProjectReference Include="..\Shared\PowerBIBlazor.Shared.csproj" />
+  </ItemGroup>
+
+
+</Project>

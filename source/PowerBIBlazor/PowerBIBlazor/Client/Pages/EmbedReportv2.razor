@@ -1,0 +1,71 @@
+﻿@page "/embedreportv2"
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+@inject HttpClient Http
+@using PowerBIBlazor.Shared
+
+@if (!gotReportInfo)
+{
+    <label>Trying to get report info...</label>
+    <br/>
+}
+@if (!String.IsNullOrEmpty(errorMessage))
+{
+    <label style="font-weight:700">Cannot embed Power BI Report:</label>
+    <span>@errorMessage</span>
+}
+
+<div id="embed-container" style="height:800px" />
+
+@code {
+    private bool gotReportInfo = false;
+    private string errorMessage = String.Empty;
+
+    private IJSObjectReference? embedModule;
+    private EmbeddedReportViewModel? reportViewModel;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (embedModule is not null)
+            {
+                if (!gotReportInfo)
+                {
+                    reportViewModel = await Http.GetFromJsonAsync<EmbeddedReportViewModel>("api/PowerBI");
+                    gotReportInfo = true;
+                    errorMessage = String.Empty;
+                    StateHasChanged();
+                }
+                await embedModule.InvokeVoidAsync("embedReport",
+                        "embed-container",
+                        reportViewModel?.Id,
+                        reportViewModel?.EmbedUrl,
+                        reportViewModel?.Token);
+            }
+            else
+            {
+                errorMessage = "embed.js not loaded.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+            StateHasChanged();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        embedModule = await JS.InvokeAsync<IJSObjectReference>("import", "./embed.js");
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (embedModule is not null)
+        {
+            await embedModule.DisposeAsync();
+        }
+    }
+
+}

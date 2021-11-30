@@ -1,0 +1,37 @@
+﻿@page "/getadtoken"
+@inject HttpClient Http
+
+@if (gotADToken)
+{
+    <label style="font-weight:700">Azure AD token for invoking Power BI Services:</label>
+    <span>@pbiApiToken</span>
+}
+else if(String.IsNullOrEmpty(errorMessage))
+{
+    <label>Trying to get AD token...</label>
+}
+else
+{
+    <label style="font-weight:700">Cannot acquire Power BI API Token from Azure AD:</label>
+    <span>@errorMessage</span>
+}
+
+@code {
+    private bool gotADToken = false;
+    private string errorMessage = String.Empty;
+    private string pbiApiToken = String.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            pbiApiToken = await Http.GetStringAsync("api/AzureADToken");
+            gotADToken = true;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+            gotADToken = false;
+        }
+    }
+}
